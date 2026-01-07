@@ -1,47 +1,52 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { useState } from "react";
 
-export default function Sidebar() {
+export default function Sidebar(){
+
   const { user } = useAuth();
+  const [open, setOpen] = useState(true);
 
-  const baseMenu = [
-    {label:"Dashboard", path:"/"},
-  ];
+  return(
+    <aside
+      className="sidebar"
+      style={{width: open ? 240 : 60, transition:"0.2s"}}>
 
-  const clientMenu = [
-    {label:"My Tickets", path:"/client/tickets"},
-    {label:"Create Ticket", path:"/client/create"},
-  ];
-
-  const devMenu = [
-    {label:"Assigned Tickets", path:"/dev/tickets"},
-  ];
-
-  const adminMenu = [
-    {label:"All Tickets", path:"/admin/tickets"},
-    {label:"Reports", path:"/admin/reports"},
-  ];
-
-  let menu = [...baseMenu];
-
-  if(user?.role === "client") menu.push(...clientMenu);
-  if(user?.role === "developer") menu.push(...devMenu);
-  if(user?.role === "admin") menu.push(...adminMenu);
-
-  return (
-    <div className="bg-gray-900 text-white w-60 min-h-screen p-5">
-
-      <p className="uppercase text-xs text-gray-400 mb-4">Navigation</p>
-
-      <div className="space-y-2">
-        {menu.map(item => (
-          <Link key={item.path} to={item.path}>
-            <div className="p-2 rounded hover:bg-gray-700 cursor-pointer">
-              {item.label}
-            </div>
-          </Link>
-        ))}
+      {/* TOGGLE */}
+      <div
+        style={{cursor:"pointer", marginBottom:20}}
+        onClick={()=>setOpen(o=>!o)}>
+        {open ? "☰" : "📂"}
       </div>
-    </div>
+
+
+      {/* MENU */}
+      {user?.role === "client" && (
+        <>
+          <Link to="/client/tickets">My Tickets</Link>
+          <Link to="/client/create">Create Ticket</Link>
+        </>
+      )}
+
+      {user?.role === "developer" && (
+        <>
+          <Link to="/dev/tickets">Developer Dashboard</Link>
+        </>
+      )}
+
+      {user?.role === "admin" && (
+        <>
+          <Link to="/admin/tickets">Admin Dashboard</Link>
+          <Link to="/admin/reports">Reports</Link>
+        </>
+      )}
+
+      {!user && (
+        <p style={{color:"#9ca3af"}}>
+          Login to access features
+        </p>
+      )}
+
+    </aside>
   );
 }
